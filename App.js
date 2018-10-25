@@ -16,6 +16,12 @@ const middleware = store => next => action => {
   return result;
 };
 
+function middleware(store) {
+  return function(next) {
+    return function(action) {};
+  };
+}
+
 const composeEnhancers =
   typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
     ? window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({})

@@ -5,28 +5,28 @@ import {
   View,
   Image,
   FlatList,
-  TouchableHighlight,
-  ActivityIndicator
+  TouchableHighlight
 } from "react-native";
 import { connect } from "react-redux";
-import { changeImage } from "../../store/actions/imageActions";
+import { changeImage, getImages } from "../../store/actions/imageActions";
 
 class Gallery extends React.Component {
   constructor() {
     super();
     this.state = {
-      data: [],
       isLoading: true
     };
   }
 
   componentDidMount() {
-    this.getData();
+    this.props.getImages(
+      "https://api.unsplash.com/photos/?client_id=cf49c08b444ff4cb9e4d126b7e9f7513ba1ee58de7906e4360afc1a33d1bf4c0"
+    );
   }
 
   onPressHandler = src => {
     const { navigate } = this.props.navigation;
-    this.props.setNewImage(src);
+    this.props.changeImage(src);
     navigate("Image");
   };
 
@@ -54,43 +54,36 @@ class Gallery extends React.Component {
     );
   };
 
-  getData() {
-    const url =
-      "https://api.unsplash.com/photos/?client_id=cf49c08b444ff4cb9e4d126b7e9f7513ba1ee58de7906e4360afc1a33d1bf4c0";
-    fetch(url)
-      .then(response => response.json())
-      .then(responseJson => {
-        this.setState({
-          data: responseJson,
-          isLoading: false
-        });
-      })
-      .catch(error => console.log(error));
-  }
-
   render() {
+    const { viewStyle, textStyle } = styles;
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center"
-        }}
-      >
-        {this.state.isLoading ? (
-          <ActivityIndicator size="large" />
-        ) : (
-          <FlatList
-            keyExtractor={item => item.id}
-            data={this.state.data}
-            renderItem={this.renderItem}
-          />
-        )}
+      <View style={viewStyle}>
+        <FlatList
+          keyExtractor={item => item.id}
+          data={this.props.data}
+          renderItem={this.renderItem}
+        />
       </View>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  viewStyle: {
+    flex: 1,
+    justifyContent: "center",
+    height: 90,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+    position: "relative"
+  },
+  textStyle: {
+    color: "#fff",
+    fontSize: 28,
+    textAlign: "center",
+    fontFamily: "AvenirNext-DemiBold"
+  },
   item: {
     margin: 5
   },
@@ -114,13 +107,20 @@ const styles = StyleSheet.create({
   }
 });
 
+const mapStateToProps = state => {
+  return {
+    data: state.gallery.data
+  };
+};
+
 const mapDispatchToProps = dispatch => {
   return {
-    setNewImage: src => dispatch(changeImage(src))
+    changeImage: src => dispatch(changeImage(src)),
+    getImages: url => dispatch(getImages(url))
   };
 };
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(Gallery);
