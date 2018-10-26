@@ -5,7 +5,8 @@ import {
   View,
   Image,
   FlatList,
-  TouchableHighlight
+  TouchableHighlight,
+  ActivityIndicator
 } from "react-native";
 import { connect } from "react-redux";
 import { changeImage, getImages } from "../../store/actions/imageActions";
@@ -13,15 +14,10 @@ import { changeImage, getImages } from "../../store/actions/imageActions";
 class Gallery extends React.Component {
   constructor() {
     super();
-    this.state = {
-      isLoading: true
-    };
   }
 
   componentDidMount() {
-    this.props.getImages(
-      "https://api.unsplash.com/photos/?client_id=cf49c08b444ff4cb9e4d126b7e9f7513ba1ee58de7906e4360afc1a33d1bf4c0"
-    );
+    this.props.getImages();
   }
 
   onPressHandler = src => {
@@ -31,8 +27,9 @@ class Gallery extends React.Component {
   };
 
   renderItem = ({ item }) => {
+    const { itemStyle, usernameStyle, userStyle, textContainer } = styles;
     return (
-      <View style={styles.item}>
+      <View style={itemStyle}>
         <TouchableHighlight onPress={() => this.onPressHandler(item.urls.full)}>
           <View>
             <Image
@@ -44,9 +41,9 @@ class Gallery extends React.Component {
                 uri: item.urls.small
               }}
             />
-            <View style={styles.textContainer}>
-              <Text style={styles.user}>{item.user.name}</Text>
-              <Text style={styles.username}>{item.user.username}</Text>
+            <View style={textContainer}>
+              <Text style={userStyle}>{item.user.name}</Text>
+              <Text style={usernameStyle}>{item.user.username}</Text>
             </View>
           </View>
         </TouchableHighlight>
@@ -55,14 +52,18 @@ class Gallery extends React.Component {
   };
 
   render() {
-    const { viewStyle, textStyle } = styles;
+    const { viewStyle } = styles;
     return (
       <View style={viewStyle}>
-        <FlatList
-          keyExtractor={item => item.id}
-          data={this.props.data}
-          renderItem={this.renderItem}
-        />
+        {this.props.loading ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <FlatList
+            keyExtractor={item => item.id}
+            data={this.props.data}
+            renderItem={this.renderItem}
+          />
+        )}
       </View>
     );
   }
@@ -84,14 +85,14 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontFamily: "AvenirNext-DemiBold"
   },
-  item: {
+  itemStyle: {
     margin: 5
   },
-  username: {
+  usernameStyle: {
     fontSize: 16,
     color: "#fff"
   },
-  user: {
+  userStyle: {
     fontSize: 18,
     fontWeight: "bold",
     color: "#fff"
@@ -109,14 +110,15 @@ const styles = StyleSheet.create({
 
 const mapStateToProps = state => {
   return {
-    data: state.gallery.data
+    data: state.gallery.data,
+    loading: state.gallery.loading
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
     changeImage: src => dispatch(changeImage(src)),
-    getImages: url => dispatch(getImages(url))
+    getImages: () => dispatch(getImages())
   };
 };
 

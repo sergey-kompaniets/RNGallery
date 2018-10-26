@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { StyleSheet, View } from "react-native";
+// import { StyleSheet, View } from "react-native";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware, compose } from "redux";
 import rootReducer from "./store/reducers/rootReducer";
@@ -15,12 +15,6 @@ const middleware = store => next => action => {
   console.log("Middleware", store.getState());
   return result;
 };
-
-function middleware(store) {
-  return function(next) {
-    return function(action) {};
-  };
-}
 
 const composeEnhancers =
   typeof window === "object" && window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__

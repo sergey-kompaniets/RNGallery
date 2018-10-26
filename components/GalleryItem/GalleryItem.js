@@ -1,8 +1,12 @@
 import React, { Component } from "react";
 import { View, Image, TouchableHighlight } from "react-native";
+
 import { connect } from "react-redux";
 
 class GalleryItem extends Component {
+  state = {
+    loading: false
+  };
   render() {
     const { navigate } = this.props.navigation;
     return (
